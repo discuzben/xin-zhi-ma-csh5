@@ -1,0 +1,180 @@
+<style>
+    .page_upgrade {
+        width: 100%;
+    }
+
+    .page_upgrade .cardbot {
+        width: 100%;
+        display: block;
+        float: left;
+        background: #FFFFFF;
+        margin-top: 5px;
+    }
+
+    .page_upgrade .cardbot .card-row {
+        width: 100%;
+        display: block;
+        float: left;
+        min-height: 50px;
+        padding: 5px 0 5px 0;
+    }
+
+    .page_upgrade .cardbot .card-row button {
+        margin-top: 15px;
+        margin-right: 10px;
+    }
+
+    .page_upgrade .appname {
+        width: 15%;
+        float: left;
+    }
+
+    .page_upgrade .appname i {
+        width: 39px;
+        height: 39px;
+        border-radius: 39px;
+        background: dodgerblue;
+        color: #FFFFFF;
+        display: block;
+        line-height: 39px;
+        margin: 5px 10px 0 10px;
+        text-align: center;
+    }
+
+    .page_upgrade .price {
+        width: 50%;
+        float: left;
+    }
+
+
+
+    .page_upgrade .card-row .rate i, .page_upgrade .card-row .strike i
+    {
+        margin-left: 10px;
+    }
+
+</style>
+<div class="page_upgrade">
+
+    <div class="cardbot ">
+
+        <div class="card-row">
+            <div class="appname">
+                <i class="font_family  icon-fuwushang"></i>
+            </div>
+            <div class="price">
+                <div class="present">
+                    <span class="present-title">服务商 </span>
+                </div>
+                <div class="limit">
+                    ￥<span style="color: red;">2980.00</span>
+                </div>
+            </div>
+            <button type="button" class="weui-btn weui-btn_primary weui-btn_mini" id="btn_update_fws">一键升级</button>
+        </div>
+        <div class="card-row">
+            <div class="rate">
+                <i class="font_family icon-yuefeilv" style="color: hotpink;"></i>
+                <span>享受终端结算费率0.55%</span>
+            </div>
+            <div class="strike">
+                <i class="font_family icon-jiesuanjia" style="color: #23cd5c;"></i>
+                <span>享受经纪人结算价138元</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="cardbot ">
+
+        <div class="card-row">
+            <div class="appname">
+                <i class="font_family  icon-fuwushang"></i>
+            </div>
+            <div class="price">
+                <div class="present">
+                    <span class="present-title">经纪人 </span>
+                </div>
+                <div class="limit">
+                    ￥<span style="color: red;">298.00</span>
+                </div>
+            </div>
+            <button type="button" class="weui-btn weui-btn_primary weui-btn_mini" id="btn_update_jjr">一键升级</button>
+        </div>
+        <div class="card-row">
+            <div class="rate">
+                <i class="font_family icon-yuefeilv" style="color: hotpink;"></i>
+                <span>享受终端结算费率0.60%</span>
+            </div>
+            <div class="strike">
+                <i class="font_family icon-jiesuanjia" style="color: #23cd5c;"></i>
+                <span>享受经纪人结算价198元</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<form id="payform" action="http://pay2.xinzhima.cn/index/wxpay/upgradeL1" target="dialog_iframe" method="post"-->
+          <!--style="display: none">-->
+    <!--</form>-->
+
+    <div id="payform_content">
+
+    </div>
+
+<script>
+    var token = "{$token}";
+    var openid="{$openid}";
+    $(function () {
+
+        //升级服务商
+        $('#btn_update_fws').on("click", function () {
+
+            $.showLoading();
+            $.post("http://pay2.xinzhima.cn/index/Wxpay/upgradeL2",{"token":token,"openid":openid},function (data,status) {
+
+                $.hideLoading();
+                if(data.status==1)
+                {
+                    $('#payform_content').html(data.order);
+                    $('#form1').submit();
+
+                }
+                else
+                {
+                    $.alert(data.msg);
+                }
+            })
+        })
+
+        $('#btn_update_jjr').on("click", function () {
+
+            $.showLoading();
+            $.post("http://pay2.xinzhima.cn/index/Wxpay/upgradeL1",{"token":token,"openid":openid},function (data,status) {
+
+                $.hideLoading();
+                if(data.status==1)
+                {
+                    //在新窗口中打开支付页面；
+
+                    // var winname = "win_wxpay";
+                    // var wintitle = "产品升级-付款";
+                    // CreateKeeWindow.createKeeWindow("keewindow",winname);
+                    // CreateKeeWindow.setTitle(winname,wintitle);
+                    // $('.' + winname + '_contents').html('<iframe id="payiframe"  name="dialog_iframe" width="100%" height="100%"></iframe>')
+                    // CreateKeeWindow.showKeeWindow(winname);
+
+                    $('#payform_content').html(data.order);
+                    $('#form1').submit();
+
+                }
+                else
+                {
+                    $.alert(data.msg);
+                }
+            })
+
+
+        })
+
+    })
+</script>

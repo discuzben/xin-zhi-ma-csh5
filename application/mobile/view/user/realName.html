@@ -1,0 +1,277 @@
+
+		<style>
+			.btn-real-name,.btn-face-recognition{
+				color: white; 
+				background-color: #007AFF;
+				width: 95%;
+				height: 50px;
+				margin: 10px;
+				outline: none;
+			}
+			.IDtips{
+				box-sizing: border-box;
+				margin: 10px;
+				font-size: 14px;
+				text-align: center;
+			}
+			.IDtips p{
+				font-size: 12px;
+			}
+			.item2ul,.item3ul{
+				list-style: none;
+				margin: 0 15px;
+				display: -webkit-flex;
+				display: flex;
+				padding: 0 40px;
+				justify-content: space-between;
+			}
+			.item2ul li{
+				position: relative;
+			}
+			.item2ul img{
+				width: 100%;
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				margin: auto;
+			}
+			.item2ul li{
+				width: 100px;
+				height: 100px;
+				background-color: white;
+				border: 1px solid rgba(0,0,0,.1);
+			}
+			.pointTo{
+				width: 100%;
+				height: 40px;
+				text-align: center;
+				line-height: 40px;
+			}
+			.pointTo span{
+				font-size: 30px;
+				padding-top: 8px;
+			}
+			.item3ul{
+				text-align: center;
+				line-height: 100px;
+			}
+			.item3ul li{
+				width: 100px;
+				height: 100px;
+				position: relative;
+			}
+			.item3ul li img{
+				width: 100px;
+				height: 100px;
+				position: absolute;
+				left: 0;
+			}
+			.item3ul li .mask{
+				width: 100px;
+				height: 100px;
+				position: absolute;
+				background-color: rgba(0,0,0,.3);
+			}
+			.item3ul li span{
+				width: 50px;
+				height: 50px;
+				position: absolute;
+				color: white;
+				font-size: 30px;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -45px;
+				top: 50%;
+			}
+			.item4ul li{
+				list-style: square inside url(/static/imgs/eg_arrow.gif);
+				margin:5px 15px;
+				font-size: 12px;
+			}
+			.weui-cells{
+				margin-top: 0;
+			}
+			.weui-uploader__input-box{
+				width:102px;
+				height: 102px; 
+				background-repeat:no-repeat; 
+				background-size:100% 100%;
+				-moz-background-size:100% 100%;
+			}
+		</style>
+
+		<div class="page_realName">
+			<div class="weui-tab">
+			    <div class="weui-navbar">
+			      <a class="weui-navbar__item weui-bar__item--on" href="#tab1">
+			        身份证实名认证
+			      </a>
+			      <a class="weui-navbar__item" href="#tab2">
+			        人脸识别
+			      </a>
+			    </div>
+			    <div class="weui-tab__bd">
+			      	<div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+			        	<form id="myForm" enctype = "multipart/form-data" @submit="onEvent($event)">
+			        		<div class="weui-cells weui-cells_form">
+							    <div class="weui-cell">
+								    <div class="weui-cell__hd"><label class="weui-label">真实姓名</label></div>
+								    <div class="weui-cell__bd">
+								        <input class="weui-input" type="text" placeholder="请输入真实姓名" v-model="form.real_name">
+								    </div>
+							    </div>
+							    <div class="weui-cell">
+								    <div class="weui-cell__hd"><label class="weui-label">身份证号</label></div>
+								    <div class="weui-cell__bd">
+								        <input class="weui-input" type="number" maxlength="18" placeholder="请输入身份证号" v-model="form.id">
+								    </div>
+							    </div>
+
+							    <div class="IDtips">
+									<span>请拍摄如下照片用于认证，可点击放大查看示例</span>
+									<p>(上传照片占用较大流量，建议使用WIFI,单张照片不超过2M)</p>
+								</div>
+
+								<!-- //图片示例 -->
+								<ul class="table-view item2ul">
+									<li class="table-view2-cell" >
+										<img src="/static/imgs/IDface.png"/>
+									</li>
+									<li class="table-view2-cell" >
+										<img src="/static/imgs/IDback.png"/>
+									</li>
+								</ul>
+
+								<!-- 指向图片 -->
+								<div class="pointTo">
+									<span class="font_family icon-jiantou_decrease"></span>
+								</div>
+	
+								<!-- 可上传图片 -->
+								<ul class="table-view item3ul" id="files">
+									<div class="weui-uploader__input-box">
+		            					<input class="weui-uploader__input" type="file" accept="image/*" @change="chooseImg(0,$event)">
+								    </div>
+									<div class="weui-uploader__input-box" style="margin-right: 0">
+		            					<input class="weui-uploader__input" type="file" accept="image/*" @change="chooseImg(1,$event)">
+								    </div>
+								</ul>
+								<ul class="table-view item4ul">
+									<li class="table-view2-cell" >
+										<span>请保证您的年龄符合18-80周岁</span>
+									</li>
+									<li class="table-view2-cell" >
+										<span>必须上传身份证、银行卡的正反面照片</span>
+									</li>
+									<li class="table-view2-cell" >
+										<span>未达到示例标准、照片不清晰、经过剪辑处理等非正常拍摄都不予通过</span>
+									</li>
+								</ul>
+								<button type="submit" name="submit" class="btn-real-name">立即实名</button>
+							</div>
+						</form>
+			        </div>
+			      <div id="tab2" class="weui-tab__bd-item">
+			        <h1>页面制作中...</h1>
+			      </div>
+			    </div>
+		    </div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			(function(){
+				
+				new Vue({
+			      el:'.page_realName',
+			      data: {
+			          form:{
+			          	real_name:'',
+			          	id:'',
+			          	files:[0,1]
+			          }
+			      },
+			      mounted () {
+
+			      } ,
+			      methods: {
+			      	chooseImg(i,e){
+			      		//使用filereader即时显示图片
+			      		let reader = new FileReader();
+			      		reader.readAsDataURL(e.target.files[0]);
+			      		let self = this;
+			      		reader.onload = function(e){
+			      			// console.log(e.target.result);
+			      			$('.weui-uploader__input').parent()[i].style.backgroundImage = "url(" + e.target.result + ")";
+			      			console.log(this);
+				      		self.form.files[i] = e.target.result;//保存需要上传的图片
+			      		}
+			      	},
+			        checkData() {
+						//验证数据
+						if(!this.form.real_name || this.form.real_name=="")
+						{
+							$.toast("请填写真实姓名！","text");
+							return false;
+						}
+						if(!this.form.id || this.form.id=="")
+						{
+							$.toast("请填写身份证号！","text");
+							return false;
+						}
+						if(this.form.files[0] == 0 || this.form.files[1] == 1){
+							$.toast("请添加两张身份证照片！","text");
+							return false;
+						}
+						console.log("开始上传：");
+					},
+					onEvent(e){
+						this.checkData();
+						//监听form的提交事件并阻止
+						console.log(event);
+						e.preventDefault();
+
+						const formData = new FormData(e.target);
+						this.upLoad(formData);
+
+					    console.log(formData);
+					    return false;
+					},
+					upLoad(fd) {
+						let uploadUrl = '/mobile/User/realnameAuth';
+						let self = this;
+						$.showLoading('数据上传中');
+						$.ajax({
+							type:'POST',
+						    url: uploadUrl,
+						    data: fd,
+						    processData:false,
+						    success(res) {
+						    	console.log("实名认证:");
+						    	//实名认证反馈用户状态
+						    	if (res.code == '0000') {
+						    		$.alert('实名认证成功，点击确认返回!','实名认证',function(){
+							      		self.openMePage();
+							      	});
+						    	}else{
+						    		$.toast(res.msg,"text");
+						    	}
+						    	console.log(res)
+						    	// let curdata = res.data;
+						    	$.hideLoading();
+						    }
+						});
+					},
+					openMePage(){
+						CreateKeeWindow.hideKeeWindow("win_real_name");
+					}
+			      },
+			      watch: {
+
+			      }
+			    });
+			})();
+		</script>
+</html>

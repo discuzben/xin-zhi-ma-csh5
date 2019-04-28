@@ -1,0 +1,19 @@
+
+<iframe id="iframe_bindcard" width="100%" height="100%"></iframe>
+<script>
+		$(function(){
+			//
+			var screenheight = document.documentElement.clientHeight;
+			$('#iframe1').height(screenheight);
+			
+			var bcuid='{$bcuid}';
+			console.log(bcuid);
+			$.post('http://pay2.xinzhima.cn/index/leshuapay/bindCardUrl',{'bcuid':bcuid},function(data){
+				console.log(JSON.stringify(data));
+				$('#iframe_bindcard').attr('srcdoc',data.url);
+			})
+			
+		})
+		
+	</script>
+

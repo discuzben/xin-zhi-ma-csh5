@@ -1,0 +1,88 @@
+<style type="text/css">
+	
+</style>
+<div class="page_repaymentChangeCardInfo">
+	<div class="weui-cells weui-cells_form" style="margin-top: 0;">
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">信用卡号</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="text" disabled="disabled"  v-model = "credit_card_no">
+		    </div>
+	    </div>
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">安全码</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="text" placeholder="请输入安全码"  v-model="form.security_code">
+		    </div>
+	    </div>
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">有效期</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="text" placeholder="请输入有效期" v-model="form.expired_time">
+		    </div>
+	    </div>
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">账单日</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="text" placeholder="请输入账单日" v-model="form.bill_day">
+		    </div>
+	    </div>
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">还款日</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="text" placeholder="请输入还款日" v-model="form.repayment_day">
+		    </div>
+	    </div>
+	    <div class="weui-cell">
+		    <div class="weui-cell__hd"><label class="weui-label">信用额度</label></div>
+		    <div class="weui-cell__bd">
+		        <input class="weui-input" type="number" placeholder="请输入信用额度" v-model="form.credit_balance">
+		    </div>
+	    </div>
+	    <a href="javascript:;" class="weui-btn weui-btn_primary" @click=postCardData()>提交</a>
+    </div>
+</div>
+<script type="text/javascript">
+	(function(){
+		new Vue({
+			el: '.page_repaymentChangeCardInfo',
+			data: {
+				credit_card_no:'',
+				form:{
+					id: page_id.id,
+					security_code: null,
+					expired_time: null,
+					bill_day: null,
+					repayment_day: null,
+					credit_balance: null
+				}
+			},
+			mounted() {
+				this.credit_card_no = this.dealdata(page_id.card_no);
+			},
+			methods:{
+				dealdata(d) {
+					console.log(d);
+					if(d.length == 0){
+						return;
+					}
+					let s = d.slice(0,4)+'*********'+d.slice(d.length-4,d.length);
+					return s;
+				},
+				postCardData() {
+					let Url = address('/api/BankCard/editCreditCard');
+					mui.post(Url,
+						this.form,
+						function(data) {
+							// console.log(JSON.stringify(data));
+							if (data.code == 1 && (typeof(token) != undefined)) {
+								$.toast(data.msg);
+							} else {
+								$.toast(data.msg);
+							}
+					}, 'json')
+				}
+			}
+		});
+	})();
+</script>

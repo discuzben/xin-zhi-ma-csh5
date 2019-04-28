@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+		<link href="../../css/mui.css" rel="stylesheet" />
+		<link href="../../css/iconfont.css" rel="stylesheet" />
+		<link href="../../css/common.css" rel="stylesheet" />
+
+		<style>
+			.mui-table-view{
+			margin-top: 0px !important;
+			}
+			.mui-control-content {
+				background-color: white;
+				min-height: 760px;
+			}
+			.mui-table-view-cell{
+				height: 50px;
+				border-bottom: 1px solid rgba(0,0,0,.1);
+				/* padding: 0 10px; */
+			}
+			.mui-table-view-cell a{
+				height: 50px;
+				line-height: 28px;
+				/* text-align: center; */
+			}
+			.mui-card{
+				width: 100%;
+				height: 49px;
+				line-height: 49px;
+				text-align: center;
+				margin: 0;
+			}
+			.mui-card a{
+				color: black;
+			}
+			#add-mail-li{
+				height: 70px;
+			}
+			#add-mail-li span{
+				font-size: 16px;
+			}
+			#add-mail-li a{
+				height: 70px;
+			}
+			#else-account{
+				list-style: none;
+				-webkit-padding-start: 10px;
+			}
+			#else-account li{
+				height: 50px;
+				width: 100px;
+				float: left;				
+				text-align: center;
+			}
+			#else-account li a{
+				height: 50px;
+				width: 100px;
+				float: left;				
+				text-align: center;
+			}
+			#else-account .iconcircle{
+				
+			}
+			#else-account li span{
+				font-size: 25px;
+				color: white;
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				position: relative;
+			}
+			#else-account li:nth-child(1) span{
+				background-color: lightseagreen;
+			}
+			#else-account li:nth-child(2) span{
+				background-color: mediumslateblue;
+			}
+			#else-account li p{
+				color: #000000;
+			}
+			.icon-duanxin:before {
+				position: absolute;
+				left: 50%;
+				margin-left: -27.75px;
+				top: 50%;
+				margin-top: -12.5px;
+			}
+			.icon-shoudong:before {
+				position: absolute;
+				left: 50%;
+				margin-left: -12.5px;
+				top: 50%;
+				margin-top: -12.5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left touch-action"></a>
+			<h1 class="mui-title">邮箱列表</h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-slider-group">
+				<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+					<div id="scroll1" class="mui-scroll-wrapper">
+						<div class="mui-scroll">
+							<ul class="mui-table-view itemul" id="itemul">
+								<li class="mui-table-view-cell" id="add-mail-li">
+									<a class="touch-action mui-navigate-right" id="add-mail">
+										<span>添加邮箱中的账单</span>
+										<p style="font-size: 13px;">添加账单收取邮箱，收取全部信用卡账单</p>
+									</a>
+								</li>
+								<li class="mui-table-view-cell" v-for = 'item in usernameList' @tap="open_account_loadprogress(item)">
+									<a class="touch-action mui-navigate-right">
+										<span>{{item.username}}</span>
+									</a>
+								</li>
+								<li class="mui-table-view-cell" id="add-mail-li">
+									<a class="touch-action" id="add-mail">
+										<span>其他方式查询账单</span>
+										<p style="font-size: 13px;">没有邮件？试试这些方式</p>
+									</a>
+								</li>
+							</ul>
+							<ul id="else-account">
+								<li>
+									<a class="mui-pull-left mepage-help touch-action">
+										<div class="iconcircle">
+											<span class="mui-icon iconfont icon-duanxin"></span>
+										</div>
+										<p>短信导入账单</p>
+									</a>
+								</li>
+								<li>
+									<a class="mui-pull-left mepage-help touch-action">
+										<span class="mui-icon iconfont icon-shoudong"></span>
+										<p>手动输入账单</p>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="../../js/mui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/md5.min.js"></script>
+		<script src="../../js/vue.min.js"></script>
+
+		<script type="text/javascript">
+			mui.init();
+			mui.plusReady(function() {
+				mui('.mui-scroll-wrapper').scroll({
+					indicators: true //是否显示滚动条
+				});
+				let Mailmyturl = address('/api/Mail/my');
+				mui.post(Mailmyturl,da(),function(data){
+					var wt=plus.nativeUI.showWaiting();
+					// console.log("我添加的邮箱列表："+JSON.stringify(data));
+					if (data.code == 1 && (typeof(token) != undefined)) {
+						wt.close();
+					plus.nativeUI.toast(data.msg);
+					let curdata = data.data;
+					
+					mui.each(curdata,function(index,item){
+						item.username = dealdata(item.username);
+					})
+					vm.usernameList = curdata;
+					
+					}else{
+						wt.close();
+						plus.nativeUI.toast(data.msg);
+					}
+				},'json')
+				
+				//添加新的邮箱
+				document.getElementById("add-mail").addEventListener("tap",function(){
+					mui.openWindow({
+						url:'add_mail.html' ,
+						id: 'add-mail',
+						waiting:{
+							autoShow:false,
+						}
+					})
+				})
+				//预加载添加邮箱详细页
+				account_loadprogress = mui.preload({
+					url: 'account_loadprogress.html',
+					id: 'account-loadprogress',
+					styles: {
+						"render": "always",
+						"popGesture": "hide",
+						"bounce": "vertical",
+						"bounceBackground": "#efeff4"
+					}
+				});
+			});
+			//请求体处理
+			function da(){
+				var da ={};
+				var token=localStorage.logintoken;
+				//保存本地的数据
+				var signkey=localStorage.signkey;
+				var signcode=sign(da,signkey);
+									
+				da['sign']=signcode;
+				return da;
+			}
+			//数据处理
+			function dealdata(d){
+				let s;
+				if(d.length == 0 && !d.indexOf('@')){
+					return;
+				}
+				s = d.slice(0,1)+'******'+d.slice(d.indexOf('@')-1,d.length);
+				return s;
+			}
+			//打开账单加载状态页面
+			function open_account_loadprogress(item) {
+				//触发子窗口传递下列数据变更计划主任务详情
+				// console.log(item.id);
+				mui.fire(account_loadprogress, 'get_addmail_detail', {
+					mail_accountid: item.id
+				});
+				setTimeout(function() {
+					account_loadprogress.show("slide-in-right", 300);
+				}, 150);
+			}
+			var vm = new Vue({
+				el: '#itemul',
+					data: {
+						usernameList: []
+					}
+			})
+		</script>
+	</body>
+
+</html>

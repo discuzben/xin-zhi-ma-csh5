@@ -1,0 +1,54 @@
+<?php /*a:1:{s:65:"/cs/docker/nginx/html/csh5/application/mobile/view/user/user.html";i:1545998117;}*/ ?>
+
+		<style>
+			.weui-cells{
+				margin-top: 0;
+			}
+
+		</style>
+
+		<div class="page_realName">
+			<form id="myForm" enctype = "multipart/form-data" @submit="onEvent($event)">
+        		<div class="weui-cells weui-cells_form">
+        			<div class="weui-cell">
+        				<i class="weui-icon-success weui-icon_msg" style="position: relative;left: 0;top: 0;right: 0;bottom: 0;margin: auto;"></i>
+				    </div>
+				    <p style="text-align: center;margin-bottom: 10px;">您已实名认证！</p>
+				    <div class="weui-cell">
+					    <div class="weui-cell__hd"><label class="weui-label">真实姓名</label></div>
+					    <div class="weui-cell__bd">
+					        <input class="weui-input" type="text" disabled="disabled" placeholder="" v-model="form.real_name">
+					    </div>
+				    </div>
+				    <div class="weui-cell">
+					    <div class="weui-cell__hd"><label class="weui-label">身份证号</label></div>
+					    <div class="weui-cell__bd">
+					        <input class="weui-input" type="text" disabled="disabled" maxlength="18" placeholder="" v-model="form.id">
+					    </div>
+				    </div>
+				</div>
+			</form>
+		</div>
+
+		<script type="text/javascript">
+			(function(){
+				new Vue({
+			      el:'.page_realName',
+			      data: {
+			          form:{
+			          	real_name:'<?php echo $user['real_name']; ?>',
+			          	id:''
+			          }
+			      },
+			      mounted () {
+			      	let uin = '<?php echo $user['idcard_no']; ?>';
+			      	if (uin) {
+			      		this.form.id = uin.slice(0,4) + '**********' + uin.slice(uin.length-4);
+			      	}else{
+			      		$.toast("无数据","text");
+			      	}
+			      }
+			    });
+			})();
+		</script>
+</html>

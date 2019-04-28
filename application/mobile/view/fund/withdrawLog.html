@@ -1,0 +1,87 @@
+
+		<style>
+			.page_withdrawLog .control-content {
+				background-color: white;
+			}
+			.page_withdrawLog .control-cell{
+				border-bottom: 1px solid rgba(200,200,200,0.2);
+			}
+			.page_withdrawLog .limit-right-top{
+				float: right;
+			}
+			.page_withdrawLog .cardbot{
+				display: -webkit-flex;
+				display: flex;
+				justify-content: space-between;
+				padding: 10px;
+			}
+		</style>
+
+		<div class="page_withdrawLog">
+			<div class="control-content">
+				<ul class="mui-table-view item1ul" id="present-record">
+					<todo-item
+					  v-for="item in recordList"
+					  v-bind:todo="item"
+					  v-bind:key="item.id">
+					</todo-item>
+				</ul>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			(function(){
+				Vue.component('todo-item', {
+				  props: ['todo'],
+				  template: '<li class="control-cell">\
+							    <div class="cardbot">\
+								    <div class="present">\
+									    <span class="present-title">余额提现</span><br>\
+									    <p class="present-time">{{todo.update_time_explain}}</p>\
+								    </div>\
+								    <div class="limit">\
+									  	<span class="limit-right-top">{{todo.coin_explain}}</span><br>\
+									  	<p class="limit-right-bottom">{{todo.status_explain}}</p>\
+								    </div>\
+							    </div>\
+						    </li>'
+				});
+				new Vue({
+					el:'.page_withdrawLog',
+					data: {
+						recordList:[]
+					},
+					mounted() {
+						this.getWithdrawLog();
+					},
+					methods:{
+						checkData(e){
+						},
+						getWithdrawLog(){
+							let withdrawUrl = '/mobile/Fund/withdrawLog';
+							$.showLoading();
+							let self = this;
+							$.post({
+							    url: withdrawUrl,
+							    success(res) {
+							    	console.log(res)
+							    	if (res.data.count == 0) {
+							    		$.alert('暂无提现记录');
+							    		return;
+							    	}
+							    	let curdata = res.data.data;
+							    	// curdata = [{'id':1,'update_time_explain':'2017/2','coin_explain':'500','status_explain':'true'},{'id':1,'update_time_explain':'2017/2','coin_explain':'500','status_explain':'true'}];
+							    	self.recordList = curdata;
+							    	$.hideLoading();
+							    }
+							});
+						}
+					}
+				});
+			})();			
+				
+			
+		</script>
+	</body>
+
+</html>

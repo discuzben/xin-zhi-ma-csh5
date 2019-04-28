@@ -1,0 +1,343 @@
+<?php /*a:1:{s:66:"/cs/docker/nginx/html/csh5/application/mobile/view/index/info.html";i:1546919452;}*/ ?>
+<style>
+.page_info
+{
+/*overflow-y: auto;*/
+    height: 100%;
+}
+.page_info .r0
+{
+    background: #1b99dc;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+}
+.page_info .r0
+{
+    color: #ffffff;
+}
+.page_info .r0 i, .page_info .r0 span
+{
+    height: 24px;
+    line-height: 24px;
+}
+
+.page_info .r0 div:first-child
+{
+    text-align:left;
+    padding-left: 2%;
+    font-size: 12px;
+}
+.page_info .r0 div:first-child i
+{
+    margin-right: 3px;
+}
+.page_info .r0 div:nth-child(2)
+{
+    text-align: center;
+    font-size: 16px;
+}
+.page_info .r0 div:last-child
+{
+    text-align:right;
+    padding-right: 2%;
+    font-size: 12px;
+}
+.page_info .r0 div:last-child i
+{
+    margin-right: 3px;
+}
+.page_info .r1{
+    height: 103%;
+    overflow: auto;
+}
+.page_info .r1 .contentview{
+
+}
+.page_info .r1 .banner {
+    height: 100%;
+    position: relative;
+    background-position: center;
+    background-color: #ccc;
+}
+
+.page_info .r1 .banner img {
+    width: 100%;
+    height: auto;
+}
+
+.page_info .r1 .banner .title {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    width: 90%;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21px;
+    color: white;
+    z-index: 11;
+}
+#index_contents {
+    overflow-y: hidden;
+}
+.weui-pull-to-refresh{
+    margin-top: -25px;
+}
+</style>
+<div class="page_info">
+    <div class="weui-flex r0">
+        <div class="weui-flex__item"><span></span></div>
+        <div class="weui-flex__item">芝麻资讯</div>
+        <div class="weui-flex__item"></div>
+    </div>
+    <div class="r1" id="newss" ontouchstart>
+        <div class="weui-pull-to-refresh__layer">
+            <div class='weui-pull-to-refresh__arrow'></div>
+            <div class='weui-pull-to-refresh__preloader'></div>
+            <div class="down">下拉刷新</div>
+            <div class="up">释放刷新</div>
+            <div class="refresh">正在刷新</div>
+        </div>
+        <div class="contentview">
+            <div class="banner">
+                <a href="javascript:;" :data-guid="banner.guid" @click="openInfoDetail(banner)">
+                    <img :src="banner.cover" />
+                    <h2 class="title">{{banner.title}}</h2>
+                    <div style="display: none;">
+                        <div class="author">{{banner.author}}</div>
+                        <div class="time">{{banner.time}}</div>
+                    </div>
+                </a>
+            </div>
+            <!-- 列表信息流 开始 -->
+            <div id="list">
+                <div class="weui-panel weui-panel_access">
+                    <div class="weui-panel__bd" v-for="item in items">
+                        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg" @click="openInfoDetail(item)">
+                            <div class="weui-media-box__hd">
+                                <img class="weui-media-box__thumb" :src="item.cover" height="100%">
+                            </div>
+                            <div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{item.title}}</h4>
+                                <p class="weui-media-box__desc">{{item.author}}</p>
+                                <p class="weui-media-box__desc">{{item.time}}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui-loadmore">
+            <i class="weui-loading"></i>
+            <span class="weui-loadmore__tips">正在加载</span>
+        </div>
+        <p class="loadnomore" style="font-size: 14px;text-align: center;display: none;width: 100%; height: 65px;line-height: 65px">没有更多数据了</p>
+    </div>
+<script>
+    // var jq = $.noConflict();
+    $(function() {
+        FastClick.attach(document.getElementById('newss'));
+
+    });
+    (function(){
+
+        var lastId = '',
+            minId = ''; //最新新闻的id 
+        var webview_detail = null; //详情页webview
+        var titleNView = { //详情页原生导航配置
+            backgroundColor: '#f7f7f7', //导航栏背景色
+            titleText: '', //导航栏标题
+            titleColor: '#000000', //文字颜色
+            type: 'transparent', //透明渐变样式
+            autoBackButton: true, //自动绘制返回箭头
+            splitLine: { //底部分割线
+                color: '#cccccc'
+            }
+        }
+
+        /**
+         *  下拉刷新获取最新列表 
+         */
+        function pulldownRefresh() {
+
+            if(window.plus && plus.networkinfo.getCurrentType() === plus.networkinfo.CONNECTION_NONE) {
+                plus.nativeUI.toast('似乎已断开与互联网的连接', {
+                    verticalAlign: 'top'
+                });
+                return;
+            }
+
+            var data = {
+                column: "id,post_id,title,author_name,cover,published_at" //需要的字段名
+            }
+
+            if(lastId) { //说明已有数据，目前处于下拉刷新，增加时间戳，触发服务端立即刷新，返回最新数据
+                data.lastId = lastId;
+                data.time = new Date().getTime() + "";
+            }
+
+            //请求顶部banner信息
+            $.getJSON("http://spider.dcloud.net.cn/api/banner/36kr", data, function(rsp) {
+                newss.banner = {
+                    guid: rsp.post_id,
+                    title: rsp.title,
+                    cover: rsp.cover,
+                    author: rsp.author_name,
+                    time: dateUtils.format(rsp.published_at)
+                };
+            });
+
+            //请求最新列表信息流
+            $.getJSON("http://spider.dcloud.net.cn/api/news", data, function(rsp) {
+                $('.page_info #newss').pullToRefreshDone();
+                console.log(rsp);
+                // mui('#list').pullRefresh().endPulldownToRefresh();
+                if(rsp && rsp.length > 0) {
+                    lastId = rsp[0].id; //保存最新消息的id，方便下拉刷新时使用
+                    
+                    if(!minId) 
+                    newss.items = convert(rsp).concat(newss.items);
+                }
+            });
+
+        }
+    /**
+     * 上拉加载拉取历史列表 
+     */
+    function pullupRefresh() {
+        var data = {
+            column: "id,post_id,title,author_name,cover,published_at" //需要的字段名
+        };
+
+        data.minId = minId;
+        data.time = new Date().getTime() + "";
+        data.pageSize = 10;
+
+        //请求历史列表信息流
+        $.getJSON("http://spider.dcloud.net.cn/api/news", data, function(rsp) {
+            if(rsp && rsp.length > 0) {
+                minId = rsp[rsp.length - 1].id; //保存最后一条消息的id，上拉加载时使用
+                newss.items = newss.items.concat(convert(rsp));
+            }else{
+                // 没数据移除加载更多显示没有更多数据了
+                $('.page_info .weui-loadmore').remove();
+                $('.page_info .loadnomore').show();
+            }
+        });
+    }
+
+    /**
+     * 1、将服务端返回数据，转换成前端需要的格式
+     * 2、若服务端返回格式和前端所需格式相同，则不需要改功能
+     * 
+     * @param {Array} items 
+     */
+    function convert(items) {
+        var newItems = [];
+        items.forEach(function(item) {
+            newItems.push({
+                guid: item.post_id,
+                title: item.title,
+                author: item.author_name,
+                cover: item.cover,
+                time: dateUtils.format(item.published_at)
+            });
+        });
+        return newItems;
+    }
+
+
+
+    /**
+     * 格式化时间的辅助类，将一个时间转换成x小时前、y天前等
+     */
+    var dateUtils = {
+        UNITS: {
+            '年': 31557600000,
+            '月': 2629800000,
+            '天': 86400000,
+            '小时': 3600000,
+            '分钟': 60000,
+            '秒': 1000
+        },
+        humanize: function(milliseconds) {
+            var humanize = '';
+            $.each(this.UNITS, function(unit, value) {
+                if(milliseconds >= value) {
+                    humanize = Math.floor(milliseconds / value) + unit + '前';
+                    return false;
+                }
+                return true;
+            });
+            return humanize || '刚刚';
+        },
+        format: function(dateStr) {
+            var date = this.parse(dateStr)
+            var diff = Date.now() - date.getTime();
+            if(diff < this.UNITS['天']) {
+                return this.humanize(diff);
+            }
+
+            var _format = function(number) {
+                return(number < 10 ? ('0' + number) : number);
+            };
+            return date.getFullYear() + '/' + _format(date.getMonth() + 1) + '/' + _format(date.getDay()) + '-' + _format(date.getHours()) + ':' + _format(date.getMinutes());
+        },
+        parse: function(str) { //将"yyyy-mm-dd HH:MM:ss"格式的字符串，转化为一个Date对象
+            var a = str.split(/[^0-9]/);
+            return new Date(a[0], a[1] - 1, a[2], a[3], a[4], a[5]);
+        }
+    }
+    console.log($('.page_info #newss').offset().top);
+
+    var newss = new Vue({
+        el: '.page_info #newss',
+        data: {
+            banner: {}, //顶部banner数据
+            items: [], //列表信息流数据
+            downloading: false,
+            uploading:false
+        },
+        mounted:function() {
+
+            pulldownRefresh();
+
+            let self = this;
+            $('.page_info #newss').pullToRefresh().on("pull-to-refresh",function() {
+             /* 当下拉刷新触发的时候执行的回调 */
+                if(self.downloading) return;
+                self.downloading = true;
+                setTimeout(function() {
+                    console.log('down')
+                    pulldownRefresh();
+                    self.downloading = false;
+                }, 2000);
+            });
+
+            global.scroll($(".page_info #newss"),function(){
+                console.log('资讯滚动');
+                //到达底部需要执行的内容
+                if(self.uploading) return;
+                self.uploading = true;
+                setTimeout(function() {
+                    console.log('up')
+                    pullupRefresh();
+                    self.uploading = false;
+                }, 2000);
+            });
+        },
+        methods:{
+            openInfoDetail(it){
+                titleNView.titleText = it.title;
+                page_id = it;
+                var winname="win_infoDetail";
+                var wintitle="制定还款计划";
+                var winurl="/mobile/index/infoDetailView";
+                CreateKeeWindow.openWindow(winname,wintitle,winurl)
+            }
+        }
+    });
+})();
+    
+</script>
